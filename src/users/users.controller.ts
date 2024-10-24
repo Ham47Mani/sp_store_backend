@@ -1,0 +1,74 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode, Res, Put } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { Response } from 'express';
+
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post() // Create New User
+  async create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
+  }
+
+  
+  @Post('/login')//- Login User
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() loginUserDto: LoginUserDto, @Res({passthrough: true}) response: Response) {
+    const loginRes: any = await this.usersService.login(loginUserDto);
+    
+    if (loginRes.success) {
+      response.cookie('_sp_store_auth_token', loginRes.result?.token, {httpOnly: true});
+    }
+
+    delete loginRes.result?.token;
+    return loginRes;
+  }
+
+  @Get('/verify-email/:otp/:email') // Verify User Account
+  async verifyEmail(@Param('otp') otp: string, @Param('email') email: string) {
+    return await this.usersService.verifyEmail(otp, email);
+  }
+
+  @Get('/send-otp-email/:email') // Resend OTP
+  async sendOtpEmail (@Param('email') email: string) {
+    return await this.usersService.sendOtpEmail(email);
+  }
+
+  @Put('/logout') // Logout
+  async logout(@Res() res: Response) {
+    res.clearCookie('_sp_store_auth_token');
+    return res.status(HttpStatus.OK).json({
+      success: true,
+      message: 'Logout Successfully'
+    })
+  }
+
+  @Get('forgot-password/:email') // Forget Password
+  async forgotPassword(@Param('email') email:string) {
+    return this.usersService.forgotPassword(email);
+  }
+
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(+id);
+  }
+
+  @Patch('/update-name-password/:id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateNameOrPassword(id, updateUserDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(+id);
+  }
+}

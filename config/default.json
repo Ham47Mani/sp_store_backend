@@ -1,0 +1,10 @@
+{
+  "port": "3100",
+  "mongodbUrl": "mongodb://localhost:27017/sp_store",
+  "adminSecretToken": "admin@123",
+
+  "emailService": {
+    "testDomain": "",
+    "privateKey": ""
+  }
+}
