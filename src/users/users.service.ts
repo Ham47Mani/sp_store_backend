@@ -211,14 +211,14 @@ export class UsersService {
   async updateNameOrPassword (id: string, updateNameOrPasswordDto: UpdateUserDto) {
     try {
       const {name, newPassword, oldPassword} = updateNameOrPasswordDto;
-
+      
       // Check if the user exists
       const user = await this.userDB.findOne({_id: id});
       if (!user)
         throw new NotFoundException("User Not Exists");
 
       // Check new Info
-      if (!name || !newPassword)
+      if (!name && !newPassword)
         throw new BadRequestException("Please provide name or password");
       else if ((newPassword && !oldPassword) || (!newPassword && oldPassword))
         throw new BadRequestException('Please provide both the old and new password');
