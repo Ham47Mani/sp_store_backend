@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode, Res, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode, Res, Put, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -38,7 +38,7 @@ export class UsersController {
     return await this.usersService.sendOtpEmail(email);
   }
 
-  @Put('/logout') // Logout
+  @Delete('/logout') // Logout
   async logout(@Res() res: Response) {
     res.clearCookie('_sp_store_auth_token');
     return res.status(HttpStatus.OK).json({
@@ -53,8 +53,8 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(@Query('type') type: string) {
+    return this.usersService.findAll(type);
   }
 
   @Get(':id')
@@ -62,7 +62,7 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
-  @Patch('/update-name-password/:id')
+  @Patch('/update-name-password/:id')// Update user info like name or password
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateNameOrPassword(id, updateUserDto);
   }

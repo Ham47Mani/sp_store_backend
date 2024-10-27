@@ -22,4 +22,9 @@ export class UserRepository {
     return await this.userModel.updateOne(query, data)
   }
 
+  // Get All Documents From DB Collection With Query
+  async findAll(query: any) {
+    return await this.userModel.find(query);
+  }
+
 }

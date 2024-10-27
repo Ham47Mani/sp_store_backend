@@ -263,8 +263,21 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  //------------- Gett All User With Type --------------
+  async findAll(type: string) {
+    try {
+      const users = await this.userDB.findAll({type});
+      return {
+        success: true,
+        message: `Users with type [${type}] fetched successfully`,
+        result: {
+          users
+        }
+      }
+    } catch (error) {
+      console.log('Get all user with type error');
+      throw error;
+    }
   }
 
   async findOne(id: number) {
