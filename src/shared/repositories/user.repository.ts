@@ -7,11 +7,6 @@ import { Injectable } from "@nestjs/common";
 export class UserRepository {
   constructor (@InjectModel(Users.name) private readonly userModel: Model<Users>) {}
 
-  // Find One Document in DB Collection
-  async findOne (query: any) {
-    return await this.userModel.findOne(query)
-  }
-
   // Create a new Document in DB Collection
   async create (query: Record<string, any>) {
     return await this.userModel.create(query);
@@ -25,6 +20,16 @@ export class UserRepository {
   // Get All Documents From DB Collection With Query
   async findAll(query: any) {
     return await this.userModel.find(query);
+  }
+
+  // Find One Document in DB Collection
+  async findOne (query: any) {
+    return await this.userModel.findOne(query)
+  }
+
+  // Find One Document in DB Collection and Get All Details
+  async findById (id: string) {
+    return await this.userModel.findById(id);
   }
 
 }

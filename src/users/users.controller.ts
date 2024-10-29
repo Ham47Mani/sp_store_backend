@@ -52,14 +52,14 @@ export class UsersController {
     return this.usersService.forgotPassword(email);
   }
 
-  @Get()
+  @Get() // Get User By Type
   async findAll(@Query('type') type: string) {
     return this.usersService.findAll(type);
   }
 
-  @Get(':id')
+  @Get('/:id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Patch('/update-name-password/:id')// Update user info like name or password

@@ -280,12 +280,17 @@ export class UsersService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       // Check if the user exists
-      const user = await this.userDB.findOne({id});
+      const user = await this.userDB.findOne({_id: id});
       if (!user) throw new BadRequestException('User Not Found');
 
+      return {
+        success: true,
+        message: "User Getting successfully",
+        result: {user}
+      }
     } catch (error) {
       console.log("Get One user Error");
       throw error; 
