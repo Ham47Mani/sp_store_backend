@@ -13,9 +13,9 @@ export class AuthMiddleware implements NestMiddleware {
   ){}
 
   async use(req: Request | any, res: Response | any, next: NextFunction) {
-    try {
+    try {      
       // Check if the token exists
-      const token = req.cookie._sp_store_auth_token;
+      const token = req.cookies._sp_store_auth_token;
       if (!token)
         throw new UnauthorizedException("Missing Auth Token");
 

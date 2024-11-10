@@ -9,13 +9,15 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionFilter } from './httpExceptionFilter';
 import { UsersModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true, load: [configuration]}),
     MongooseModule.forRoot(config.get('mongodbUrl')),
     UsersModule,
-    MailModule
+    MailModule,
+    ProductsModule
   ],
   controllers: [AppController],
   providers: [AppService, {

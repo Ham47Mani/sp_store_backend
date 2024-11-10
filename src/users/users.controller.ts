@@ -4,6 +4,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Response } from 'express';
+import { Roles } from 'src/shared/guards/role.decorators';
+import { userTypes } from 'src/enums/users.enums';
 
 @Controller('users')
 export class UsersController {
@@ -53,6 +55,7 @@ export class UsersController {
   }
 
   @Get() // Get User By Type
+  @Roles(userTypes.ADMIN)
   async findAll(@Query('type') type: string) {
     return this.usersService.findAll(type);
   }

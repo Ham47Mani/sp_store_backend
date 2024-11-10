@@ -18,7 +18,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       statusCode: httpStatus,
       timeStamp: new Date().toISOString(),
       path: httpAdapter.getRequestUrl(ctx.getRequest),
-      message: (exceptionResponse as HttpExceptionResponse).message || (exceptionResponse as HttpExceptionResponse).error || exceptionResponse || 'Something went wrong!!',
+      message: (exceptionResponse as HttpExceptionResponse).error || (exceptionResponse as HttpExceptionResponse).message ||  exceptionResponse || 'Something went wrong!!',
       error: exceptionResponse
     };
 
