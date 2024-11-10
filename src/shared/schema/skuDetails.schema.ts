@@ -17,9 +17,6 @@ export class SkuDetails extends Document {
   lifetime: boolean;
 
   @Prop({})
-  stripePriceId: string;
-
-  @Prop({})
   skuCode?: string
 
 }
