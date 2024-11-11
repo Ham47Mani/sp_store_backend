@@ -18,6 +18,11 @@ export class ProductRepository {
 
   // Update one document (Product) in collection
   async updateOneProduct (query: any, data: Record<string, any>) {
-    return await this.productModel.updateOne(query, data);
+    return await this.productModel.findOneAndUpdate(query, data, {new: true});
+  }
+
+  // Get one document (Product) in collection
+  async findOneProduct (id: string) {
+    return await this.productModel.findById(id);
   }
 }

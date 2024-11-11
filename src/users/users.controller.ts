@@ -62,17 +62,17 @@ export class UsersController {
   }
 
   @Get('/:id')
-  findOne(@Param('id') id: ValidateMongoID) {
+  findOne(@Param('id', ValidateMongoID) id: string) {
     return this.usersService.findOne(id);
   }
 
   @Patch('/update-name-password/:id')// Update user info like name or password
-  update(@Param('id') id: ValidateMongoID, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id', ValidateMongoID) id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateNameOrPassword(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: ValidateMongoID) {
+  remove(@Param('id', ValidateMongoID) id: string) {
     return this.usersService.remove(id);
   }
 }

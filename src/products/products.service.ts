@@ -1,8 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductRepository } from 'src/shared/repositories/product.repository';
-import { ValidateMongoID } from 'src/shared/pipes/ValidateMongoId.pipe';
 
 @Injectable()
 export class ProductsService {
@@ -29,14 +28,27 @@ export class ProductsService {
     return `This action returns all products`;
   }
 
-  findOne(id: number) {
+  findOneProduct(id: string) {
     return `This action returns a #${id} product`;
   }
 
   // --- Update a Products
-  async updateProduct(id: ValidateMongoID, updateProductDto: UpdateProductDto) {
+  async updateProduct(id: string, updateProductDto: UpdateProductDto) {
     try {
-      // Check if the "id" is a valid mongo id
+      // Check if the product exists
+      const product = await this.productDB.findOneProduct(id);
+      if (!product)
+        throw new NotFoundException("This product not exists");
+
+      // Update the product
+      const updatedProduct = await this.productDB.updateOneProduct({_id: id}, updateProductDto);
+      
+      return {
+        message: "Product Updated Successfully",
+        suces: true, 
+        result: updatedProduct
+      }
+
     } catch (error) {
       console.log("Update product error : ", error);
       throw error;

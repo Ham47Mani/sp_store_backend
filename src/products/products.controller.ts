@@ -20,9 +20,8 @@ export class ProductsController {
 
   // --- Update a Products
   @Patch(':id')
-  @HttpCode(200)
   @Roles(userTypes.ADMIN)
-  async updateProduct(@Param('id') id: ValidateMongoID, @Body() updateProductDto: UpdateProductDto) {
+  async updateProduct(@Param('id', ValidateMongoID) id: string, @Body() updateProductDto: UpdateProductDto) {
     return await this.productsService.updateProduct(id, updateProductDto);
   }
 
@@ -32,8 +31,8 @@ export class ProductsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+  findOne(@Param('id', ValidateMongoID) id: string) {
+    return this.productsService.findOneProduct(id);
   }
 
   @Delete(':id')
