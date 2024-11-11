@@ -6,6 +6,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { Response } from 'express';
 import { Roles } from 'src/shared/guards/role.decorators';
 import { userTypes } from 'src/enums/users.enums';
+import { ValidateMongoID } from 'src/shared/pipes/ValidateMongoId.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -61,17 +62,17 @@ export class UsersController {
   }
 
   @Get('/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: ValidateMongoID) {
     return this.usersService.findOne(id);
   }
 
   @Patch('/update-name-password/:id')// Update user info like name or password
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: ValidateMongoID, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateNameOrPassword(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  remove(@Param('id') id: ValidateMongoID) {
+    return this.usersService.remove(id);
   }
 }

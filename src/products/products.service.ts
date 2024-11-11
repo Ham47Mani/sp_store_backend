@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductRepository } from 'src/shared/repositories/product.repository';
+import { ValidateMongoID } from 'src/shared/pipes/ValidateMongoId.pipe';
 
 @Injectable()
 export class ProductsService {
@@ -9,10 +10,10 @@ export class ProductsService {
   constructor (@Inject(ProductRepository) private readonly productDB: ProductRepository) {}
 
   //--- Create a new product
-  async create(createProductDto: CreateProductDto) {
+  async createProduct(createProductDto: CreateProductDto) {
     try {
       // Create Product in DB
-      const createProductInDB = await this.productDB.create(createProductDto);
+      const createProductInDB = await this.productDB.createProduct(createProductDto);
       return {
         message: "Product created successfully",
         success: true,
@@ -32,8 +33,14 @@ export class ProductsService {
     return `This action returns a #${id} product`;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  // --- Update a Products
+  async updateProduct(id: ValidateMongoID, updateProductDto: UpdateProductDto) {
+    try {
+      // Check if the "id" is a valid mongo id
+    } catch (error) {
+      console.log("Update product error : ", error);
+      throw error;
+    }
   }
 
   remove(id: number) {

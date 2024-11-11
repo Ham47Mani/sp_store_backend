@@ -8,6 +8,7 @@ import { UserRepository } from 'src/shared/repositories/user.repository';
 import { comparePassword, generateHashPassword } from 'src/shared/utility/password.manager';
 import { generateAuthToken } from 'src/shared/utility/token.management';
 import { MailService } from 'src/mail/mail.service';
+import { ValidateMongoID } from 'src/shared/pipes/ValidateMongoId.pipe';
 
 @Injectable()
 export class UsersService {
@@ -208,7 +209,7 @@ export class UsersService {
   }
 
   //------------- Update Name or Password --------------
-  async updateNameOrPassword (id: string, updateNameOrPasswordDto: UpdateUserDto) {
+  async updateNameOrPassword (id: ValidateMongoID, updateNameOrPasswordDto: UpdateUserDto) {
     try {
       const {name, newPassword, oldPassword} = updateNameOrPasswordDto;
       
@@ -280,7 +281,7 @@ export class UsersService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: ValidateMongoID) {
     try {
       // Check if the user exists
       const user = await this.userDB.findOne({_id: id});
@@ -301,7 +302,7 @@ export class UsersService {
     return `This action updates a #${id} user`; 
   }
 
-  remove(id: number) {
+  remove(id: ValidateMongoID) {
     return `This action removes a #${id} user`;
   }
 }

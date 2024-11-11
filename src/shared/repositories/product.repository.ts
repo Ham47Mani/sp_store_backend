@@ -11,8 +11,13 @@ export class ProductRepository {
   constructor ( @InjectModel(Products.name) private readonly productModel: Model<Products> ){}
 
   // Create a new document (Product) in collection
-  async create (product: CreateProductDto) {
+  async createProduct (product: CreateProductDto) {
     const createdProduct = await this.productModel.create(product);
     return createdProduct;
+  }
+
+  // Update one document (Product) in collection
+  async updateOneProduct (query: any, data: Record<string, any>) {
+    return await this.productModel.updateOne(query, data);
   }
 }
