@@ -1,15 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Roles } from 'src/shared/guards/role.decorators';
+import { userTypes } from 'src/enums/users.enums';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  @HttpCode(201)
+  @Roles(userTypes.ADMIN)
+  async create(@Body() createProductDto: CreateProductDto) {
+    return await this.productsService.create(createProductDto);
   }
 
   @Get()

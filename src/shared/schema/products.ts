@@ -13,8 +13,8 @@ export class Products extends Document {
   @Prop({required: true})
   description: string;
 
-  @Prop({required: true})
-  image: string;
+  @Prop({default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWz9tftw9qculFH1gxieWkxL6rbRk_hrXTSg&s"})
+  image?: string;
 
   @Prop({required: true, enum: [categoryType.applicationSoftware, categoryType.operatingSystem]})
   category: string;
@@ -40,7 +40,7 @@ export class Products extends Document {
   @Prop([{type: SkuDetailSchema}])
   skuDetails: SkuDetails[];
 
-  @Prop()
+  @Prop({type: Object})
   imageDetails: Record<string, any>;
 
   @Prop()

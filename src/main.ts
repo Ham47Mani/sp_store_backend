@@ -8,6 +8,7 @@ async function bootstrap() {
   const PORT = process.env.PORT // Get the port from .env file
 
   app.use(cookieParser());// Add cookie parser for managing cookies
+  app.setGlobalPrefix(process.env.APP_PREFIX)
   await app.listen(PORT, () => {
     console.log(`Server is running on port:  ${PORT}`);
     
