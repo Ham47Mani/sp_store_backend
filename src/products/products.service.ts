@@ -28,12 +28,27 @@ export class ProductsService {
     return `This action returns all products`;
   }
 
-  findOneProduct(id: string) {
-    return `This action returns a #${id} product`;
+  //--- Get one product with ID
+  async findOneProduct(id: string) {
+    try {
+      // Check if the product exists
+      const product = await this.productDB.findOneProduct(id); 
+      if (!product)
+        throw new NotFoundException("This product not exists");
+
+      return {
+        message: `Product id [${id}] fetched successufully`,
+        success: true,
+        result: product
+      }
+    } catch (error) {
+      console.log("Find One Product by ID Error");
+      throw error;
+    }
   }
 
   // --- Update a Products
-  async updateProduct(id: string, updateProductDto: UpdateProductDto) {
+  async updateProduct(id: string, updateProductDto: UpdateProductDto) { 
     try {
       // Check if the product exists
       const product = await this.productDB.findOneProduct(id);
@@ -55,7 +70,22 @@ export class ProductsService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  // --- Remove a Products
+  async removeProduct(id: string) {
+    try {
+      // Check if the product exists
+      const product = await this.productDB.deleteOneProduct(id);
+      if (!product)
+        throw new NotFoundException("This product not exists");
+
+      return {
+        message: `Product id [${id}] Deleted`,
+        success: true,
+        result: product
+      }
+    } catch (error) {
+      console.log("Remove product error");
+      throw error;
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -30,13 +30,17 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
+  // --- Get One Products
   @Get(':id')
-  findOne(@Param('id', ValidateMongoID) id: string) {
+  @HttpCode(HttpStatus.OK)
+  async findOne(@Param('id', ValidateMongoID) id: string) {
     return this.productsService.findOneProduct(id);
   }
 
+  // --- Remove One Products
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+  @HttpCode(HttpStatus.OK)
+  async removeProduct(@Param('id', ValidateMongoID) id: string) {
+    return this.productsService.removeProduct(id);
   }
 }

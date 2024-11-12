@@ -25,4 +25,9 @@ export class ProductRepository {
   async findOneProduct (id: string) {
     return await this.productModel.findById(id);
   }
+
+  // Delete one document (Product) in collection
+  async deleteOneProduct (id: string) {
+    return this.productModel.findOneAndDelete({_id: id});
+  }
 }
