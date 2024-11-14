@@ -131,4 +131,9 @@ export class ProductsService {
       throw error;
     }
   }
+
+  // --- Upload Product Image
+  async uploadProductImage (id: string, body: any) {
+
+  }
 }

@@ -45,4 +45,11 @@ export class ProductsController {
   async removeProduct(@Param('id', ValidateMongoID) id: string) {
     return await this.productsService.removeProduct(id);
   }
+
+  // --- Upload Product Image
+  @Post(':id/image')
+  @Roles(userTypes.ADMIN)
+  async uploadProductImage (@Param('id', ValidateMongoID) id: string, @Body() body: any) {
+    return this.productsService.uploadProductImage(id, body)
+  }
 }

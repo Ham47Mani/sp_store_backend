@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { TransormationInterceptor } from './responseInterceptor';
 import cookieParser from 'cookie-parser';
+import { TransformationInterceptor } from './responseInterceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -9,6 +9,7 @@ async function bootstrap() {
 
   app.use(cookieParser());// Add cookie parser for managing cookies
   app.setGlobalPrefix(process.env.APP_PREFIX)
+  app.useGlobalInterceptors(new TransformationInterceptor);
   await app.listen(PORT, () => {
     console.log(`Server is running on port:  ${PORT}`);
     
