@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Roles } from 'src/shared/guards/role.decorators';
 import { userTypes } from 'src/enums/users.enums';
 import { ValidateMongoID } from 'src/shared/pipes/ValidateMongoId.pipe';
+import { GetProductQueryDto } from './dto/get-product-query.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -25,22 +26,23 @@ export class ProductsController {
     return await this.productsService.updateProduct(id, updateProductDto);
   }
 
+  // --- Get All Product With query "Search"
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  async findAllProducts(@Query() query: GetProductQueryDto) {
+    return await this.productsService.findAllProducts(query);
   }
 
   // --- Get One Products
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findOne(@Param('id', ValidateMongoID) id: string) {
-    return this.productsService.findOneProduct(id);
+    return await this.productsService.findOneProduct(id);
   }
 
   // --- Remove One Products
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async removeProduct(@Param('id', ValidateMongoID) id: string) {
-    return this.productsService.removeProduct(id);
+    return await this.productsService.removeProduct(id);
   }
 }

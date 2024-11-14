@@ -2,6 +2,8 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductRepository } from 'src/shared/repositories/product.repository';
+import { GetProductQueryDto } from './dto/get-product-query.dto';
+import qsToMongo from 'qs-to-mongo';
 
 @Injectable()
 export class ProductsService {
@@ -24,8 +26,50 @@ export class ProductsService {
     }
   }
 
-  findAll() {
-    return `This action returns all products`;
+  // --- Get All Products
+  async findAllProducts(query: GetProductQueryDto) {
+    try {
+      let callForHomePage: boolean = false;
+      if (query.homePage)
+        callForHomePage = true;
+
+      delete query.homePage;
+      const {options, links} = qsToMongo(query);
+
+      if (callForHomePage) {
+        const products = await this.productDB.findProductsWithGroupBy();
+
+        return {
+          message: products.length > 0 ? `Products fetched succesfully` : `No products founds`,
+          success: true,
+          result: {
+            latestProducts: products[0].latestProducts,
+            topRatedProducts: products[0].topRatedProducts,
+          }
+        }
+      } else {
+        const {totalProductsCount, products} = await this.productDB.find(query);
+        console.log("Links    : ", links);
+        
+        return {
+          message: products.length > 0 ? `Products fetched succesfully` : `No products founds`,
+          success: true,
+          result: {
+            metadata: {
+              skip: options.skip || 0,
+              limit: options.limit || 10,
+              total: totalProductsCount,
+              page: options.limit ? Math.ceil(totalProductsCount / options.limit) : 1,
+              links: links("/", totalProductsCount),
+            },
+            products
+          }
+        }
+      }
+    } catch (error) {
+      console.log("Get all products error");
+      throw error;
+    }
   }
 
   //--- Get one product with ID
