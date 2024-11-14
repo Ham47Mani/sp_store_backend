@@ -49,7 +49,6 @@ export class ProductsService {
         }
       } else {
         const {totalProductsCount, products} = await this.productDB.find(query);
-        console.log("Links    : ", links);
         
         return {
           message: products.length > 0 ? `Products fetched succesfully` : `No products founds`,
