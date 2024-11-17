@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -6,6 +6,7 @@ import { Roles } from 'src/shared/guards/role.decorators';
 import { userTypes } from 'src/enums/users.enums';
 import { ValidateMongoID } from 'src/shared/pipes/ValidateMongoId.pipe';
 import { GetProductQueryDto } from './dto/get-product-query.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('products')
 export class ProductsController {
@@ -49,7 +50,15 @@ export class ProductsController {
   // --- Upload Product Image
   @Post(':id/image')
   @Roles(userTypes.ADMIN)
-  async uploadProductImage (@Param('id', ValidateMongoID) id: string, @Body() body: any) {
-    return this.productsService.uploadProductImage(id, body)
+  @UseInterceptors( // Use Built-in FileInterceptor for set Name for the file and set a limit size to 3Mb
+    FileInterceptor("product_image", {
+      dest: process.env.FILE_STORAGE_PATH || './uploads/',
+      limits: {
+        fileSize: 3145728 // 1024 * 1024 * 3 = 3MB
+      }
+    })
+  )
+  async uploadProductImage (@Param('id', ValidateMongoID) id: string, @UploadedFile() file: Express.Multer.File) {
+    return this.productsService.uploadProductImage(id, file);
   }
 }

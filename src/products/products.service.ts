@@ -4,11 +4,19 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductRepository } from 'src/shared/repositories/product.repository';
 import { GetProductQueryDto } from './dto/get-product-query.dto';
 import qsToMongo from 'qs-to-mongo';
+import { CloudinaryServices } from 'src/shared/cloudinary/cloudinary.management';
+import { UploadApiOptions } from 'cloudinary';
+import { unlinkSync } from 'fs';
 
 @Injectable()
 export class ProductsService {
+  // Declaration
+  private cloudinaryServices: CloudinaryServices;
+
   // Inject the product repository
-  constructor (@Inject(ProductRepository) private readonly productDB: ProductRepository) {}
+  constructor (@Inject(ProductRepository) private readonly productDB: ProductRepository) {
+    this.cloudinaryServices = new CloudinaryServices();
+  }
 
   //--- Create a new product
   async createProduct(createProductDto: CreateProductDto) {
@@ -133,7 +141,53 @@ export class ProductsService {
   }
 
   // --- Upload Product Image
-  async uploadProductImage (id: string, body: any) {
+  async uploadProductImage (id: string, file: Express.Multer.File): Promise<any> {    
+    try {
+      // Check if the product exists
+      const product = await this.productDB.findOneProduct(id);
+      if (!product)
+        throw new NotFoundException("Product does not exist");
 
+      // Check the product file exist in cloudinary
+      if (product.imageDetails?.public_id) {
+        await this.cloudinaryServices.destroy(product.imageDetails?.public_id, {invalidate: true})
+      }
+      // Options of upload file
+      const options: UploadApiOptions = {
+        folder: process.env.CLOUDINARY_FOLDER_PATH,
+        public_id: process.env.CLOUDINARY_PUBLIC_ID_PREFIX,
+        transformation: [
+          {
+            width: process.env.CLOUDINARY_BIG_SIZE.toString().split('X')[0],
+            height: process.env.CLOUDINARY_BIG_SIZE.toString().split('X')[0],
+            crop: 'fill'
+          },
+          { quality: 'auto'}
+        ]
+      }
+      // Upload file
+      const resOfCloudinary = await this.cloudinaryServices.uploadFile(file.path, options);
+      // Remove the file from local server storage
+      unlinkSync(file.path);
+
+      // Update the product with product image info
+      const updatedProduct = await this.productDB.updateOneProduct({_id: id}, {
+        imageDetails: resOfCloudinary,
+        image: resOfCloudinary.secure_url
+      });
+
+      return {
+        message: "Image uploaded successfully",
+        success: true,
+        result: {
+          product: updatedProduct,
+          product_image_url: updatedProduct.image
+        }
+      }
+
+    } catch (error) {
+      console.log("Upload product image error in uploadProductImage [products.service]");
+      throw error;
+    }
   }
 }
