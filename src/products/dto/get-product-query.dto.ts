@@ -22,5 +22,5 @@ export class GetProductQueryDto {
 
   @IsOptional()
   @IsString()
-  homePage: string;
+  homePage?: string;
 }

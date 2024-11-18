@@ -7,6 +7,7 @@ import qsToMongo from 'qs-to-mongo';
 import { CloudinaryServices } from 'src/shared/cloudinary/cloudinary.management';
 import { UploadApiOptions } from 'cloudinary';
 import { unlinkSync } from 'fs';
+import { Products } from 'src/shared/schema/products';
 
 @Injectable()
 export class ProductsService {
@@ -87,10 +88,16 @@ export class ProductsService {
       if (!product)
         throw new NotFoundException("This product not exists");
 
+      // Get Related Products and Delete The Current Product
+      const {products} = await this.productDB.find({category: product.category});
+      let relatedProduct: Products[] = []
+      if (products.length > 0)
+        relatedProduct = products.filter(relatedProduct => relatedProduct._id.toString() !== product._id.toString());
+
       return {
         message: `Product id [${id}] fetched successufully`,
         success: true,
-        result: product
+        result: {product, relatedProduct}
       }
     } catch (error) {
       console.log("Find One Product by ID Error");

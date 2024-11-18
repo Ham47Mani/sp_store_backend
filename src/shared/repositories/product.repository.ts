@@ -68,4 +68,9 @@ export class ProductRepository {
 
     return {totalProductsCount, products};
   }
+
+  // Get all products with cretiria and options
+  async findRelatedProduct (query: Record<string, any>): Promise<Products[] | []> {
+    return await this.productModel.find(query);
+  }
 }

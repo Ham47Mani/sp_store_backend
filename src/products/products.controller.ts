@@ -36,7 +36,7 @@ export class ProductsController {
   // --- Get One Products
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async findOne(@Param('id', ValidateMongoID) id: string) {
+  async findOneProduct(@Param('id', ValidateMongoID) id: string) {
     return await this.productsService.findOneProduct(id);
   }
 
