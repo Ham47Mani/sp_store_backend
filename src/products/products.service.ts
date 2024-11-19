@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductRepository } from 'src/shared/repositories/product.repository';
@@ -8,6 +8,7 @@ import { CloudinaryServices } from 'src/shared/cloudinary/cloudinary.management'
 import { UploadApiOptions } from 'cloudinary';
 import { unlinkSync } from 'fs';
 import { Products } from 'src/shared/schema/products';
+import { ProductSkuArrayDto, ProductSkuDto } from './dto/productSku.dto';
 
 @Injectable()
 export class ProductsService {
@@ -197,4 +198,77 @@ export class ProductsService {
       throw error;
     }
   }
+
+  // --- Update Or Create Single Or Multiple Sku product
+  async updateOrCreateProductSku (productId: string, {skus}: ProductSkuArrayDto) {
+    try {
+      // Check if the sku array exist
+      if (!skus)
+        throw new BadRequestException("Please add skus you need to add to the product");
+
+      // Check if the product is exist
+      const product = await this.productDB.findOneProduct(productId);
+      if (!product)
+        throw new NotFoundException("Product does not exist");
+
+      // Generate SkuCode For Each Sku
+      skus.map(sku => sku.skuCode = Math.random().toString(36).substring(2,5) + Date.now());
+
+      // Update The Product
+      const updatedProduct = await this.productDB.updateOneProduct(
+        {_id: productId},
+        {$push: {skuDetails: skus}}
+      );
+
+      return {
+        message: "Product Sku Updated Successfully",
+        success: true,
+        result: updatedProduct
+      }
+
+    } catch (error) {
+      console.log(`Update Or Create product sku details error [${error.message}]`);
+      throw error
+    }
+  }
+
+  // --- Update A Single Sku product
+  async updateProductSkuById (productId: string, skuCode: string, skuDetails: ProductSkuDto) {
+    try {
+      // Check if the product is exist
+      const product = await this.productDB.findOneProduct(productId);
+      if (!product)
+        throw new NotFoundException("Product does not exist");
+
+      // Check if the sku is exist
+      const sku = product.skuDetails.find(sku => sku.skuCode == skuCode);
+      if (!sku)
+        throw new NotFoundException("Sku does not exist");
+
+      // Update the sku
+      const dataForUpdate = {
+        skuCode
+      }
+      for (const key in skuDetails) {
+        if(skuDetails.hasOwnProperty(key)) {
+          dataForUpdate[`skuDetails.$.${key}`] = skuDetails[key]
+        }
+      }
+      const updatedProduct = await this.productDB.updateOneProduct(
+        {_id: productId, 'skuDetails.skuCode': skuCode},
+        {$set: {dataForUpdate}}
+      );
+
+      return {
+        message: "Product sku updated successfully",
+        success: true,
+        result: updatedProduct
+      }
+
+    } catch (error) {
+      console.log(`Upldate Product sku By ID error [${error.message}]`);
+      throw error;
+    }
+  }
+
 }

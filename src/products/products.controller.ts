@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query, UseInterceptors, UploadedFile, Put } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -7,6 +7,7 @@ import { userTypes } from 'src/enums/users.enums';
 import { ValidateMongoID } from 'src/shared/pipes/ValidateMongoId.pipe';
 import { GetProductQueryDto } from './dto/get-product-query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ProductSkuArrayDto, ProductSkuDto } from './dto/productSku.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -60,5 +61,22 @@ export class ProductsController {
   )
   async uploadProductImage (@Param('id', ValidateMongoID) id: string, @UploadedFile() file: Express.Multer.File) {
     return this.productsService.uploadProductImage(id, file);
+  }
+
+  // --- Update Or Create Single Or Multiple Sku product
+  @Post("/:productId/skus")
+  @Roles(userTypes.ADMIN)
+  async updateOrCreateProductSku(@Param('productId', ValidateMongoID) productId: string, @Body() productSkuArrayDto: ProductSkuArrayDto) {
+    return this.productsService.updateOrCreateProductSku(productId, productSkuArrayDto);
+  }
+
+  @Put("/:productId/skus/:skuCode")
+  @Roles(userTypes.ADMIN)
+  async updateSingleProductSku(
+    @Param('productId', ValidateMongoID) productId: string,
+    @Param('skuCode') skuCode: string,
+    @Body() productSkuDto: ProductSkuDto
+  ) {
+    return this.productsService.updateProductSkuById(productId, skuCode, productSkuDto);
   }
 }
