@@ -70,6 +70,7 @@ export class ProductsController {
     return this.productsService.updateOrCreateProductSku(productId, productSkuArrayDto);
   }
 
+  // --- Update Product Sku By Sku Code
   @Put("/:productId/skus/:skuCode")
   @Roles(userTypes.ADMIN)
   async updateSingleProductSku(
@@ -78,5 +79,54 @@ export class ProductsController {
     @Body() productSkuDto: ProductSkuDto
   ) {
     return this.productsService.updateProductSkuById(productId, skuCode, productSkuDto);
+  }
+
+  // --- Get All Skus for Product
+  @Get('/:productId/skus')
+  async getAllProductSkus (@Param('productId', ValidateMongoID) productId: string) {
+    return this.productsService.getAllProductSkus(productId);
+  }
+
+  // --- Create License to Product Sku
+  @Post("/:productId/skus/:skuId/licenses")
+  @Roles(userTypes.ADMIN)
+  async addProductSkuLicense (
+    @Param("productId", ValidateMongoID) productId: string,
+    @Param("skuId", ValidateMongoID) skuId: string,
+    @Body("licenseKey") licenseKey: string
+  ) {
+    return this.productsService.addProductSkuLicense(productId, skuId, licenseKey);
+  }
+
+  // --- Update License Key
+  @Put("/licenses/:licenseId")
+  @Roles(userTypes.ADMIN)
+  async updateLicenseKey (
+    @Param('licenseId', ValidateMongoID) licenseId: string,
+    @Body("licenseKey") licenseKey: string
+  ) {
+    return this.productsService.updateLicenseKey(licenseId, licenseKey);
+  }
+
+  // --- Delete License
+  @Delete("/licenses/:licenseId")
+  @Roles(userTypes.ADMIN)
+  async removeProductLicense (@Param('licenseId', ValidateMongoID) licenseId: string) {
+    return this.productsService.removeProductSkuLicense(licenseId);
+  }
+
+  // --- Get All Licenses
+  @Get("/licenses/:licenseId")
+  async getLicenseById (@Param("licenseId", ValidateMongoID) licenseId: string) {
+    return this.productsService.getLicenseById(licenseId);
+  }
+
+  // --- Get All Licenses
+  @Get("/:productId/skus/:skuID/licenses")
+  async getAllLicense (
+    @Param("productId", ValidateMongoID) productId: string,
+    @Param("skuID", ValidateMongoID) skuID: string
+  ) {
+    return this.productsService.getAllLicenses(productId, skuID);
   }
 }

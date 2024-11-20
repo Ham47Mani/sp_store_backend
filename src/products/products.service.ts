@@ -271,4 +271,140 @@ export class ProductsService {
     }
   }
 
+  // --- Get All Product Skus
+  async getAllProductSkus (productID: string) {
+    try {
+      // Check if the products exist
+      const product = await this.productDB.findOneProduct(productID);
+      if (!product)
+        throw new NotFoundException("This product does not exist");
+
+      return {
+        message: "Fetch all skus product",
+        success: true,
+        result: product.skuDetails
+      }
+    } catch (error) {
+      console.log(`Fetch all product skus error : ${error.message}`);
+      throw error;
+    }
+  }
+
+  // --- Add Product Sku License
+  async addProductSkuLicense (productID:string, skuID: string, licenseKey: string) {
+    try {
+      // Check if the product exist
+      const product = await this.productDB.findOneProduct(productID);
+      if (!product)
+        throw new NotFoundException("This product does not exist");
+
+      const sku = product.skuDetails.find(sku => sku._id.toString() === skuID);
+      if (!sku)
+        throw new NotFoundException("This sku does not exist");
+
+      // Add the license key to the product
+      const license = await this.productDB.createLicense(productID, skuID, licenseKey);
+
+      return {
+        message: "Product license created successfully",
+        success: true,
+        result: license
+      }
+
+    } catch (error) {
+      console.log(`Add product sku license error : ${error.message}`);
+      throw error;
+    }
+  }
+
+  // --- Update Licence Key
+  async updateLicenseKey (licenseID: string, licenseKey: string) {
+    try {
+      // Check if the license exist
+      const license = await this.productDB.findOneLicense(licenseID);
+      if (!license)
+        throw new NotFoundException("This license does not exist");
+
+      // Updated license
+      const updatedLicense = await this.productDB.updateLicenseKey({_id: licenseID}, licenseKey);
+  
+      return {
+        message: "Updated license successfully",
+        success: true, 
+        result: updatedLicense
+      }
+
+    } catch (error) {
+      console.log(`Update Product Sku License error : ${error.message}`);
+      throw error;
+    }
+  }
+
+  // --- Remove License Prduct Sku
+  async removeProductSkuLicense (licenseID: string) {
+    try {
+      // Check if the license exist
+      const license = await this.productDB.findOneLicense(licenseID);
+      if (!license)
+        throw new NotFoundException("This license does not exist");
+
+      const deletedLicense = await this.productDB.removeLicense(licenseID);
+
+      return {
+        message: "Delete license successfully",
+        success: true,
+        result: deletedLicense
+      }
+    } catch (error) {
+      console.log(`Remove Product License Error : ${error.message}`);
+      throw error;
+    }
+  }
+
+  // --- Get License By ID
+  async getLicenseById (licenseID: string) {
+    try {
+      // Check if the license exist
+      const license = await this.productDB.findOneLicense(licenseID);
+      if (!license)
+        throw new NotFoundException('This license does not exist');
+
+      return {
+        message: "Fetch license by ID successfully",
+        success: true,
+        result: license
+      }
+    } catch (error) {
+      console.log("This license does not exist");
+      throw error;
+    }
+  }
+
+  // --- Get All Product Sku Licenses
+  async getAllLicenses (productID: string, skuID: string) {
+    try {
+      // Check if the product exist
+      const product = await this.productDB.findOneProduct(productID);
+      if (!product)
+        throw new NotFoundException('Product does not exist');
+
+      // Check if the sku exist
+      const sku = product.skuDetails.find(sku => sku._id.toString() === skuID);
+      if (!sku)
+        throw new NotFoundException("Sku does not exist");
+
+      // Get licenses
+      const licenses = await this.productDB.getAllLicense(productID, skuID);
+
+      return {
+        message: "Fetch all license successfully",
+        success: true,
+        result: licenses
+      }
+
+    } catch (error) {
+      console.log(`Gett all license for sku product error : ${error.message}`);
+      throw error
+    }
+  }
 }

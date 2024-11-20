@@ -5,12 +5,16 @@ import { Products } from "../schema/products";
 import { CreateProductDto } from "src/products/dto/create-product.dto";
 import { GetProductQueryDto } from "src/products/dto/get-product-query.dto";
 import qsToMongo from "qs-to-mongo";
+import { License } from "../schema/license.schema";
 
 
 @Injectable()
 export class ProductRepository {
 
-  constructor ( @InjectModel(Products.name) private readonly productModel: Model<Products> ){}
+  constructor ( 
+    @InjectModel(Products.name) private readonly productModel: Model<Products>,
+    @InjectModel(License.name) private readonly licenceModel: Model<License>
+  ){}
 
   // Create a new document (Product) in collection
   async createProduct (product: CreateProductDto) {
@@ -72,5 +76,35 @@ export class ProductRepository {
   // Get all products with cretiria and options
   async findRelatedProduct (query: Record<string, any>): Promise<Products[] | []> {
     return await this.productModel.find(query);
+  }
+
+  // Create License
+  async createLicense (productID: string, skuID: string, licenseKey: string) {
+    const license = await this.licenceModel.create({
+      product: productID,
+      productSku: skuID,
+      licenseKey
+    })
+    return license;
+  }
+
+  // Update License
+  async updateLicenseKey (query: Record<string, any>, newLicenseKey: string) {
+    return await this.licenceModel.findOneAndUpdate(query, {licenseKey: newLicenseKey}, {new: true});
+  }
+
+  // Get License
+  async findOneLicense (licenseID: string) {
+    return await this.licenceModel.findById(licenseID);
+  }
+
+  // Remove License
+  async removeLicense (licenseID: string) {
+    return this.licenceModel.findOneAndDelete({_id: licenseID});
+  }
+
+  // Get All License
+  async getAllLicense (productID: string, skuID: string) {
+    return await this.licenceModel.find({product: productID, productSku: skuID});
   }
 }

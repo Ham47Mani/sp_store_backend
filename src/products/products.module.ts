@@ -9,12 +9,14 @@ import { RoleGuard } from 'src/shared/guards/roles.guard';
 import { Users, UserSchema } from 'src/shared/schema/users';
 import { AuthMiddleware } from 'src/shared/middlewares/auth.middleware';
 import { UserRepository } from 'src/shared/repositories/user.repository';
+import { License, licenseSchema } from 'src/shared/schema/license.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {name: Products.name, schema: ProductsSchema},
-      {name: Users.name, schema: UserSchema}
+      {name: Users.name, schema: UserSchema},
+      {name: License.name, schema: licenseSchema}
     ])
   ],
   controllers: [ProductsController],
@@ -31,7 +33,8 @@ export class ProductsModule implements NestModule {
       .apply(AuthMiddleware)
       .exclude(
         { path: `/products`, method: RequestMethod.GET },
-        { path: `products/:id`, method: RequestMethod.GET }
+        { path: `/products/:id*`, method: RequestMethod.GET },
+        
       )
       .forRoutes(ProductsController);
   }
