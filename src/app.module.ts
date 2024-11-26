@@ -10,6 +10,7 @@ import { AllExceptionFilter } from './httpExceptionFilter';
 import { UsersModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
 import { ProductsModule } from './products/products.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { ProductsModule } from './products/products.module';
     MongooseModule.forRoot(config.get('mongodbUrl')),
     UsersModule,
     MailModule,
-    ProductsModule
+    ProductsModule,
+    OrdersModule
   ],
   controllers: [AppController],
   providers: [AppService, {

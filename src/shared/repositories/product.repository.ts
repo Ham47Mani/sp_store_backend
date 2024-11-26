@@ -98,6 +98,11 @@ export class ProductRepository {
     return await this.licenceModel.findById(licenseID);
   }
 
+  // Get License With Query
+  async findLicense (query: any) {
+    return await this.licenceModel.find(query);
+  }
+
   // Remove License
   async removeLicense (licenseID: string) {
     return this.licenceModel.findOneAndDelete({_id: licenseID});

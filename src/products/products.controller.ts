@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query, UseInterceptors, UploadedFile, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query, UseInterceptors, UploadedFile, Put, Req } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -128,5 +128,27 @@ export class ProductsController {
     @Param("skuID", ValidateMongoID) skuID: string
   ) {
     return this.productsService.getAllLicenses(productId, skuID);
+  }
+
+  // --- Add Product rating and Review
+  @Post('/:productId/reviews')
+  @Roles(userTypes.CUSTOMER)
+  async addProductReview(
+    @Param('productId', ValidateMongoID) productID: string,
+    @Body('rating') rating: string,
+    @Body('reviw') reviw: string,
+    @Req() req: any
+  ) {
+    return this.productsService.addProductReview(productID, rating, reviw, req.user);
+  }
+
+  // --- Remove Product rating and Review
+  @Post('/:productId/reviews')
+  @Roles(userTypes.CUSTOMER)
+  async removeProductReview(
+    @Param('productId', ValidateMongoID) productID: string,
+    @Param('reviewId', ValidateMongoID) reviewId: string,
+  ) {
+    return this.productsService.removeProductReview(productID, reviewId);
   }
 }

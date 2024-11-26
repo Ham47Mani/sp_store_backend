@@ -407,4 +407,83 @@ export class ProductsService {
       throw error
     }
   }
+
+  // --- Add Product Ratting and Review
+  async addProductReview (productID: string, rating: any, review: any, user: Record<string, any>) {
+    try {
+      // Check if product exists or not
+      const product = await this.productDB.findOneProduct(productID);
+      if (!product)
+        throw new NotFoundException('This Product does not exists');
+
+      // Check if the customer have give the review for product
+      if (product.feedbackDetails.find((value: {customerId: string}) => value.customerId === user._id.toString()))
+        throw new BadRequestException('You ave already give the review for this produc');
+
+      const ratings: any[] = [];
+      product.feedbackDetails.forEach((comment : {rating: any}) => ratings.push(comment.rating));
+      let avgRating = String(rating);
+      if (ratings.length > 0)
+        avgRating = (ratings.reduce((a,b) => a + b) / ratings.length).toFixed(2)
+
+      const reviewDetails = {
+        customerId: user.id,
+        customerName: user.name,
+        rating: rating,
+        feedbackMsg: review
+      };
+
+      const updatedProduct = await this.productDB.updateOneProduct(
+        {_id: productID},
+        {
+          $push: {feedbackDetails: reviewDetails},
+          $set: {avgRating: avgRating}
+        }
+      )
+
+      return {
+        message: "Product review added successfully",
+        success: true,
+        result: updatedProduct
+      }
+      
+    } catch (error) {
+      console.log(`Add product review service error : [${error.message}]`);
+      throw error;
+    }
+  }
+
+  // --- Remove Product Ratting and Review
+  async removeProductReview (productID: string, reviewId: string) {
+    try {
+      // Check if product exists or not
+      const product = await this.productDB.findOneProduct(productID);
+      if (!product)
+        throw new NotFoundException('This Product does not exists');
+
+      const ratings: any[] = [];
+      product.feedbackDetails.forEach((comment : {rating: any}) => ratings.push(comment.rating));
+      let avgRating;
+      if (ratings.length > 0)
+        avgRating = (ratings.reduce((a,b) => a + b) / ratings.length).toFixed(2)
+
+      const updatedProduct = await this.productDB.updateOneProduct(
+        {_id: productID},
+        {
+          $pull: {feedbackDetails: {_id: reviewId}},
+          $set: {avgRating: avgRating}
+        }
+      )
+
+      return {
+        message: "Product review remove successfully",
+        success: true,
+        result: updatedProduct
+      }
+      
+    } catch (error) {
+      console.log(`Remove product review service error : [${error.message}]`);
+      throw error;
+    }
+  }
 }
